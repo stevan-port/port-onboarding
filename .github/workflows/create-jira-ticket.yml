@@ -9,6 +9,9 @@ on:
       short_title:
         required: true
         type: string
+      project:
+        required: true
+        type: string
       port_context:
         required: true
         type: string
@@ -93,7 +96,7 @@ jobs:
         id: create
         uses: atlassian/gajira-create@v3
         with:
-          project: ${{ inputs.project }}
+          project: ${{inputs.project}}
           issuetype: Bug
           summary: ${{inputs.short_title}}
           description: |
