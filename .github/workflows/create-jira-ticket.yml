@@ -97,7 +97,7 @@ jobs:
         uses: atlassian/gajira-create@v3
         with:
           project: ${{inputs.project}}
-          issuetype: Bug
+          issuetype: Task
           summary: ${{inputs.short_title}}
           description: |
             ${{inputs.description}}
