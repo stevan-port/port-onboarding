@@ -110,7 +110,7 @@ jobs:
           fields: |-
             ${{ steps.user_list_from_search.outputs.selected_user_id != 'empty'
               && format('{{"reporter": {{"id": "{0}" }}}}', steps.user_list_from_search.outputs.selected_user_id)
-              || {"labels": ["$customer_name"]}
+              || format('{{"labels": ["{0}"]}}', env.customer_name)
             }}
 
       - name: Inform creation of Jira issue
