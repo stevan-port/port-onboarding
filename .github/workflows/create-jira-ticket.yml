@@ -20,7 +20,7 @@ on:
         type: string
 
 env:
-  customer_name: ${{ fromJson(inputs.customer_name) }}
+  customer_name: ${{ inputs.customer_name }}
 
 jobs:
   create_jira_issue:
