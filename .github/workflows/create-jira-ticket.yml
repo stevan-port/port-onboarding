@@ -105,9 +105,10 @@ jobs:
           description: |
             ${{inputs.description}}
           fields: |-
+            customer_name=$(${{ fromJson(inputs.customer_name) }})
             ${{ steps.user_list_from_search.outputs.selected_user_id != 'empty'
               && format('{{"reporter": {{"id": "{0}" }}}}', steps.user_list_from_search.outputs.selected_user_id)
-              || '{"labels": ["${{fromJson(inputs.customer_name)}}"]}'
+              || '{"labels": ["$customer_name"]}'
             }}
 
       - name: Inform creation of Jira issue
