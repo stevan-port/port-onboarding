@@ -19,9 +19,6 @@ on:
         required: true
         type: string
 
-env:
-  customer_name: ${{inputs.customer_name}}
-
 jobs:
   create_jira_issue:
     runs-on: ubuntu-latest
@@ -98,6 +95,12 @@ jobs:
           logMessage: |
             Creating a new Jira issue.. ⛴️
 
+      - name: Set sanitized customer name
+        id: sanitize
+        run: echo "sanitized_name=${CUSTOMER_NAME// /-}" >> $GITHUB_OUTPUT
+        env:
+            CUSTOMER_NAME: ${{inputs.customer_name}}
+          
       - name: Create Jira issue
         id: create
         uses: atlassian/gajira-create@v3
@@ -110,7 +113,7 @@ jobs:
           fields: |-
             ${{ steps.user_list_from_search.outputs.selected_user_id != 'empty'
               && format('{{"reporter": {{"id": "{0}" }}}}', steps.user_list_from_search.outputs.selected_user_id)
-              || format('{{"labels": ["{0}"]}}', env.customer_name)
+              || format('{{"labels": ["{0}"]}}', steps.sanitize.outputs.sanitized_name)
             }}
 
       - name: Inform creation of Jira issue
