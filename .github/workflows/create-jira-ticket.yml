@@ -117,7 +117,7 @@ jobs:
       - name: Build Jira fields object
         id: build-jira-fields
         run: |
-          raw_name="${{ inputs.customer_name }}"
+          raw_name="${{inputs.customer_name}}"
           sanitized_name="${raw_name// /-}"
           fields="{
             \"labels\": [\"$sanitized_name\"],
@@ -128,7 +128,7 @@ jobs:
           echo "JIRA_FIELDS=$fields" >> $GITHUB_OUTPUT
         env:
           REPORTER_ID: ${{ steps.get-reporter.outputs.REPORTER_USER_ID }}
-        
+
 
       - name: Create Jira issue
         id: create
