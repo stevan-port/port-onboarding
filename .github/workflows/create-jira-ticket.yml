@@ -101,6 +101,19 @@ jobs:
       #   env:
       #       CUSTOMER_NAME: ${{inputs.customer_name}}
 
+      - name: Get reporter user ID
+        id: get-reporter
+        run: |
+          jira_auth="${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}"
+          reporter_email="${{ fromJson(inputs.port_context).triggered_by }}"
+          response=$(curl -s -u "$jira_auth" -G \
+            --data-urlencode "query=$reporter_email" \
+            "https://getport.atlassian.net/rest/api/3/user/search")
+
+          # Extract the user's ID from the response using jq
+          user_id=$(echo "$response" | jq -r '.[0].accountId')
+          echo "REPORTER_USER_ID=$user_id" >> $GITHUB_OUTPUT
+
       - name: Build Jira fields object
         id: build-jira-fields
         run: |
@@ -109,7 +122,7 @@ jobs:
           fields="{
             \"labels\": [\"$sanitized_name\"],
             \"assignee\": {\"id\": \"712020:dc3aacca-65c1-4330-984d-a65d44600253\"},
-            \"reporter\": {\"id\": \"712020:451c86ee-4176-40df-a1c4-709e8b6e8357\"}
+            \"reporter\": {"id": "${{ steps.get-reporter.outputs.REPORTER_USER_ID }}"}
           }"
           echo $fields
           echo "JIRA_FIELDS=$(echo $fields)" >> $GITHUB_OUTPUT
