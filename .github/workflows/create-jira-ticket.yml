@@ -95,12 +95,24 @@ jobs:
           logMessage: |
             Creating a new Jira issue.. ⛴️
 
-      - name: Set sanitized customer name
-        id: sanitize
-        run: echo "sanitized_name=${CUSTOMER_NAME// /-}" >> $GITHUB_OUTPUT
-        env:
-            CUSTOMER_NAME: ${{inputs.customer_name}}
-          
+      # - name: Set sanitized customer name
+      #   id: sanitize
+      #   run: echo "sanitized_name=${CUSTOMER_NAME// /-}" >> $GITHUB_OUTPUT
+      #   env:
+      #       CUSTOMER_NAME: ${{inputs.customer_name}}
+
+      - name: Build Jira fields object
+        id: build-jira-fields
+        run: |
+          echo "sanitized_name=${${{inputs.customer_name}}// /-}" >> $GITHUB_OUTPUT
+          fields='{
+            "labels": [${sanitized_name}],
+            "assignee": stevanv+test@getport.io
+            "reporter": stevanv+johnny@getport.io
+          }'
+          echo $fields
+          echo "JIRA_FIELDS=$(echo $fields)" >> $GITHUB_OUTPUT
+
       - name: Create Jira issue
         id: create
         uses: atlassian/gajira-create@v3
@@ -110,12 +122,13 @@ jobs:
           summary: ${{inputs.short_title}}
           description: |
             ${{inputs.description}}
-          fields: |-
-            ${{ steps.user_list_from_search.outputs.selected_user_id != 'empty'
-              && format('{{"reporter": {{"id": "{0}" }}}}', steps.user_list_from_search.outputs.selected_user_id)
-              && format('{{"assignee": ["{0}"]}}', 'stevanv+test@getport.io')
-              || format('{{"labels": ["{0}"]}}', steps.sanitize.outputs.sanitized_name)
-            }}
+          fields: ${{ steps.build-jira-fields.outputs.JIRA_FIELDS }}
+            # fields: |-
+          #   ${{ steps.user_list_from_search.outputs.selected_user_id != 'empty'
+          #     && format('{{"reporter": {{"id": "{0}" }}}}', steps.user_list_from_search.outputs.selected_user_id)
+          #     && format('{{"assignee": ["{0}"]}}', 'stevanv+test@getport.io')
+          #     || format('{{"labels": ["{0}"]}}', steps.sanitize.outputs.sanitized_name)
+          #   }}
 
       - name: Inform creation of Jira issue
         uses: port-labs/port-github-action@v1
