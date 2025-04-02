@@ -104,6 +104,19 @@ jobs:
       #   env:
       #       CUSTOMER_NAME: ${{inputs.customer_name}}
 
+      - name: Get assignee user ID
+        id: get-assignee
+        run: |
+          jira_auth="${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}"
+          assignee_email="${{inputs.customer_name}}"
+          response=$(curl -s -u "$jira_auth" -G \
+            --data-urlencode "query=$assignee_email" \
+            "https://port-csm.atlassian.net/rest/api/3/user/search")
+
+          # Extract the user's ID from the response using jq
+          user_id=$(echo "$response" | jq -r '.[0].accountId')
+          echo "ASSIGNEE_USER_ID=$user_id" >> $GITHUB_OUTPUT
+
       - name: Get reporter user ID
         id: get-reporter
         run: |
@@ -122,9 +135,14 @@ jobs:
         run: |
           raw_name="${{inputs.customer_name}}"
           sanitized_name="${raw_name// /-}"
+          
+          raw_customer_engineer="${{inputs.customer_engineer}}"
+          if [ "$customer_engineer" == "Ayodeji" ]; then
+          customer_engineer="712020:77418b87-f1a0-434b-954c-466b807b4364"
+
           fields="{
             \"labels\": [\"$sanitized_name\"],
-            \"assignee\": {\"id\": \"${{inputs.customer_engineer}}\"},
+            \"assignee\": {\"id\": \"${{ steps.get-assignee.outputs.ASSIGNEE_USER_ID }}\"},
             \"reporter\": {\"id\": \"${{ steps.get-reporter.outputs.REPORTER_USER_ID }}\"}
           }"
           echo "$fields"
