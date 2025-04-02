@@ -122,12 +122,10 @@ jobs:
           fields="{
             \"labels\": [\"$sanitized_name\"],
             \"assignee\": {\"id\": \"712020:451c86ee-4176-40df-a1c4-709e8b6e8357\"},
-            \"reporter\": {\"id\": \"$REPORTER_ID\"}
+            \"reporter\": {\"id\": \"${{ steps.get-reporter.outputs.REPORTER_USER_ID }}\"}
           }"
           echo "$fields"
           echo "JIRA_FIELDS=$(echo $fields)" >> $GITHUB_OUTPUT
-        env:
-          REPORTER_ID: ${{ steps.get-reporter.outputs.REPORTER_USER_ID }}
 
 
       - name: Create Jira issue
