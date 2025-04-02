@@ -108,8 +108,8 @@ jobs:
           sanitized_name="${raw_name// /-}"
           fields='{
             "labels": ["$sanitized_name"],
-            "assignee": stevanv+test@getport.io
-            "reporter": stevanv+johnny@getport.io
+            "assignee": "stevanv+test@getport.io"
+            "reporter": "stevanv+johnny@getport.io"
           }'
           echo $fields
           echo "JIRA_FIELDS=$(echo $fields)" >> $GITHUB_OUTPUT
