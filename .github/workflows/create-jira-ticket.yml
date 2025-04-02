@@ -43,31 +43,10 @@ jobs:
           logMessage: |
             Searching for user in organization user list... ⛴️
 
-      - name: Search for reporter among user list
-        id: search_for_reporter
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: "${{ secrets.JIRA_BASE_URL }}/rest/api/3/user/search?query=${{ fromJson(inputs.port_context).triggered_by }}"
-          method: "GET"
-          username: ${{ secrets.JIRA_USER_EMAIL }}
-          password: ${{ secrets.JIRA_API_TOKEN }}
-          customHeaders: '{"Content-Type": "application/json"}'
-
       - name: Install jq
         run: sudo apt-get install jq
-        if: steps.search_for_reporter.outcome == 'success'
 
-      - name: Retrieve user list from search
-        id: user_list_from_search
-        if: steps.search_for_reporter.outcome == 'success'
-        run: |
-          selected_user_id=$(echo '${{ steps.search_for_reporter.outputs.response }}' | jq -r 'if length > 0 then .[0].accountId else "empty" end')
-          selected_user_name=$(echo '${{ steps.search_for_reporter.outputs.response }}' | jq -r 'if length > 0 then .[0].displayName else "empty" end')
-          echo "selected_user_id=${selected_user_id}" >> $GITHUB_OUTPUT
-          echo "selected_user_name=${selected_user_name}" >> $GITHUB_OUTPUT
-
-      - name: Inform user existence
-        if: steps.user_list_from_search.outputs.selected_user_id != 'empty'
+      - name: Inform retrieval of Jira Assignee ID
         uses: port-labs/port-github-action@v1
         with:
           clientId: ${{ secrets.PORT_CLIENT_ID }}
@@ -75,34 +54,7 @@ jobs:
           operation: PATCH_RUN
           runId: ${{ fromJson(inputs.port_context).run_id }}
           logMessage: |
-            User found 🥹 Bug reporter will be ${{ steps.user_list_from_search.outputs.selected_user_name }}... ⛴️
-
-      - name: Inform user inexistence
-        if: steps.user_list_from_search.outputs.selected_user_id == 'empty'
-        uses: port-labs/port-github-action@v1
-        with:
-          clientId: ${{ secrets.PORT_CLIENT_ID }}
-          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
-          operation: PATCH_RUN
-          runId: ${{ fromJson(inputs.port_context).run_id }}
-          logMessage: |
-            User not found 😭 Bug will be created with default reporter ⛴️
-
-      - name: Inform starting of jira issue creation
-        uses: port-labs/port-github-action@v1
-        with:
-          clientId: ${{ secrets.PORT_CLIENT_ID }}
-          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
-          operation: PATCH_RUN
-          runId: ${{ fromJson(inputs.port_context).run_id }}
-          logMessage: |
-            Creating a new Jira issue.. ⛴️
-
-      # - name: Set sanitized customer name
-      #   id: sanitize
-      #   run: echo "sanitized_name=${CUSTOMER_NAME// /-}" >> $GITHUB_OUTPUT
-      #   env:
-      #       CUSTOMER_NAME: ${{inputs.customer_name}}
+            Retrieving Assignee ID from Jira.. ⛴️
 
       - name: Get assignee user ID
         id: get-assignee
@@ -120,6 +72,16 @@ jobs:
           echo "user_id is: $user_id"
           echo "ASSIGNEE_USER_ID=$user_id" >> $GITHUB_OUTPUT
 
+      - name: Inform retrieval of Jira Reporter ID
+        uses: port-labs/port-github-action@v1
+        with:
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: PATCH_RUN
+          runId: ${{ fromJson(inputs.port_context).run_id }}
+          logMessage: |
+            Retrieving Reporter ID from Jira.. ⛴️
+          
       - name: Get reporter user ID
         id: get-reporter
         run: |
@@ -132,6 +94,16 @@ jobs:
           # Extract the user's ID from the response using jq
           user_id=$(echo "$response" | jq -r '.[0].accountId')
           echo "REPORTER_USER_ID=$user_id" >> $GITHUB_OUTPUT
+
+      - name: Inform retrieval of Jira Reporter ID
+        uses: port-labs/port-github-action@v1
+        with:
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: PATCH_RUN
+          runId: ${{ fromJson(inputs.port_context).run_id }}
+          logMessage: |
+            Creating a new Jira issue.. ⛴️
 
       - name: Build Jira fields object
         id: build-jira-fields
