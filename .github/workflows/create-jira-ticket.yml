@@ -108,7 +108,7 @@ jobs:
         id: get-assignee
         run: |
           jira_auth="${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}"
-          assignee_email="${{inputs.customer_name}}"
+          assignee_email=$(echo ${{inputs.customer_engineer}} | jq -r .identifier"
           response=$(curl -s -u "$jira_auth" -G \
             --data-urlencode "query=$assignee_email" \
             "https://port-csm.atlassian.net/rest/api/3/user/search")
@@ -135,10 +135,6 @@ jobs:
         run: |
           raw_name="${{inputs.customer_name}}"
           sanitized_name="${raw_name// /-}"
-          
-          raw_customer_engineer="${{inputs.customer_engineer}}"
-          if [ "$customer_engineer" == "Ayodeji" ]; then
-          customer_engineer="712020:77418b87-f1a0-434b-954c-466b807b4364"
 
           fields="{
             \"labels\": [\"$sanitized_name\"],
