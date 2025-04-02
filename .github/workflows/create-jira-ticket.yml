@@ -117,15 +117,18 @@ jobs:
       - name: Build Jira fields object
         id: build-jira-fields
         run: |
-          raw_name="${{inputs.customer_name}}"
+          raw_name="${{ inputs.customer_name }}"
           sanitized_name="${raw_name// /-}"
           fields="{
             \"labels\": [\"$sanitized_name\"],
             \"assignee\": {\"id\": \"712020:dc3aacca-65c1-4330-984d-a65d44600253\"},
-            \"reporter\": {"id": "${{ steps.get-reporter.outputs.REPORTER_USER_ID }}"}
+            \"reporter\": {\"id\": \"$REPORTER_ID\"}
           }"
-          echo $fields
-          echo "JIRA_FIELDS=$(echo $fields)" >> $GITHUB_OUTPUT
+          echo "$fields"
+          echo "JIRA_FIELDS=$fields" >> $GITHUB_OUTPUT
+        env:
+          REPORTER_ID: ${{ steps.get-reporter.outputs.REPORTER_USER_ID }}
+        
 
       - name: Create Jira issue
         id: create
