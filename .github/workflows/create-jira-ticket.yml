@@ -104,9 +104,10 @@ jobs:
       - name: Build Jira fields object
         id: build-jira-fields
         run: |
-          echo "sanitized_name=${${{inputs.customer_name}}// /-}" >> $GITHUB_OUTPUT
+          raw_name="${{inputs.customer_name}}"
+          sanitized_name="${raw_name// /-}"
           fields='{
-            "labels": [${sanitized_name}],
+            "labels": ["$sanitized_name"],
             "assignee": stevanv+test@getport.io
             "reporter": stevanv+johnny@getport.io
           }'
