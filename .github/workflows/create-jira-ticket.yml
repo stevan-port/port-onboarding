@@ -108,7 +108,7 @@ jobs:
         id: get-assignee
         run: |
           jira_auth="${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}"
-          assignee_email=$(echo ${{inputs.customer_engineer}} | jq -r .identifier")
+          assignee_email=$(echo '${{inputs.customer_engineer}}' | jq -r '.identifier')
           echo "assignee email is: $assignee_email"
           response=$(curl -s -u "$jira_auth" -G \
             --data-urlencode "query=$assignee_email" \
