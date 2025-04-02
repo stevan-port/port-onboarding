@@ -109,7 +109,7 @@ jobs:
           fields="{
             \"labels\": [\"$sanitized_name\"],
             \"assignee\": \"stevanv+test@getport.io\",
-            \"reporter\": \"stevanv+johnny@getport.io\"
+            \"reporter\": \"stevanv+csm@getport.io\"
           }"
           echo $fields
           echo "JIRA_FIELDS=$(echo $fields)" >> $GITHUB_OUTPUT
