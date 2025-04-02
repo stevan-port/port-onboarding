@@ -109,12 +109,15 @@ jobs:
         run: |
           jira_auth="${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}"
           assignee_email=$(echo ${{inputs.customer_engineer}} | jq -r .identifier")
+          echo "assignee email is: $assignee_email"
           response=$(curl -s -u "$jira_auth" -G \
             --data-urlencode "query=$assignee_email" \
             "https://port-csm.atlassian.net/rest/api/3/user/search")
 
+          echo "response is: $response"
           # Extract the user's ID from the response using jq
           user_id=$(echo "$response" | jq -r '.[0].accountId')
+          echo "user_id is: $user_id"
           echo "ASSIGNEE_USER_ID=$user_id" >> $GITHUB_OUTPUT
 
       - name: Get reporter user ID
