@@ -109,7 +109,7 @@ jobs:
           fields="{
             \"labels\": [\"$sanitized_name\"],
             \"assignee\": {\"id\": \"712020:dc3aacca-65c1-4330-984d-a65d44600253\"},
-            \"reporter\": {\"id\": \"712020:451c86ee-4176-40df-a1c4-709e8b6e835\"}
+            \"reporter\": {\"id\": \"712020:451c86ee-4176-40df-a1c4-709e8b6e8357\"}
           }"
           echo $fields
           echo "JIRA_FIELDS=$(echo $fields)" >> $GITHUB_OUTPUT
