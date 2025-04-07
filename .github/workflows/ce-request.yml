@@ -50,7 +50,7 @@ jobs:
           assignee_email=$(echo '${{inputs.customer_engineer}}' | jq -r '.identifier')
           response=$(curl -s -u "$jira_auth" -G \
             --data-urlencode "query=$assignee_email" \
-            "https://port-csm.atlassian.net/rest/api/3/user/search")
+            "https://getport.atlassian.net/rest/api/3/user/search")
 
           # Extract the user's ID from the response using jq
           user_id=$(echo "$response" | jq -r '.[0].accountId')
@@ -73,7 +73,7 @@ jobs:
           reporter_email="${{ fromJson(inputs.port_context).triggered_by }}"
           response=$(curl -s -u "$jira_auth" -G \
             --data-urlencode "query=$reporter_email" \
-            "https://port-csm.atlassian.net/rest/api/3/user/search")
+            "https://getport.atlassian.net/rest/api/3/user/search")
 
           # Extract the user's ID from the response using jq
           user_id=$(echo "$response" | jq -r '.[0].accountId')
