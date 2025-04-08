@@ -9,9 +9,6 @@ on:
       short_title:
         required: true
         type: string
-      project:
-        required: true
-        type: string
       port_context:
         required: true
         type: string
@@ -25,6 +22,8 @@ on:
 jobs:
   create_jira_issue:
     runs-on: ubuntu-latest
+    env:
+      JIRA_PROJECT: 'CCS'    
     steps:
       - name: Login
         uses: atlassian/gajira-login@v3
@@ -107,7 +106,7 @@ jobs:
         id: create
         uses: atlassian/gajira-create@v3
         with:
-          project: ${{inputs.project}}
+          project: ${{ env.JIRA_PROJECT }}
           issuetype: Task
           summary: ${{inputs.short_title}}
           description: |
